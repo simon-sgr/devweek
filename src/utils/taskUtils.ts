@@ -6,8 +6,23 @@ const priorityOrder: Record<TaskData["priority"], number> = {
   low: 3,
 };
 
-export function sortTasksByPriority(tasks: TaskData[]): TaskData[] {
-  return [...tasks].sort(
-    (a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]
-  );
+export function sortTasks(tasks: TaskData[]): TaskData[] {
+  return [...tasks].sort((a, b) => {
+    // 1 Completed last
+    if (a.completed !== b.completed) {
+      return a.completed ? 1 : -1;
+    }
+
+    // 2 Priority
+    const prioDiff =
+      priorityOrder[a.priority] - priorityOrder[b.priority];
+    if (prioDiff !== 0) {
+      return prioDiff;
+    }
+
+    // 3 Name (title)
+    return a.title.localeCompare(b.title, undefined, {
+      sensitivity: "base",
+    });
+  });
 }

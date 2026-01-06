@@ -35,3 +35,42 @@
 .task__title {
   font-size: 14px;
 }
+
+.drag-handle {
+  cursor: grab;
+  padding: 0 6px;
+  font-size: 16px;
+  user-select: none;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-handle {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0; /* remove padding */
+  width: 16px;  /* fixed width */
+  margin-right: 8px;
+  cursor: grab;
+  user-select: none;
+}
+
+.drag-handle span {
+  width: 12px;
+  height: 2px;
+  background-color: #666;
+  border-radius: 2px;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+input[type="checkbox"] {
+  cursor: pointer;
+  z-index: 10;
+  position: relative; /* needed for z-index */
+}

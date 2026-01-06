@@ -1,11 +1,3 @@
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from "@dnd-kit/core";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { useState } from "react";
 
@@ -31,29 +23,10 @@ export default function Calendar({
   const weekDays = getCurrentWorkWeek();
   const todayStr = new Date().toISOString().slice(0, 10);
 
-  const sensors = useSensors(useSensor(PointerSensor));
-
   const [addingDate, setAddingDate] = useState<string | null>(null);
 
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    if (!over) return;
-
-    const taskId = active.id as string;
-    const newDate = over.id as string;
-
-    const task = tasks.find((t) => t.id === taskId);
-    if (task && task.date !== newDate) {
-      onUpdateTask({ ...task, date: newDate });
-    }
-  }
-
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
+    <>
       <div className="calendar">
         {weekDays.map((date) => {
           const dateStr = date.toISOString().slice(0, 10);
@@ -61,7 +34,11 @@ export default function Calendar({
           const dayTasks = tasks.filter((t) => t.date === dateStr);
 
           return (
-            <DroppableDay key={dateStr} id={dateStr} isToday={isToday}>
+            <DroppableDay
+              key={dateStr}
+              id={`date:${dateStr}`}
+              isToday={isToday}
+            >
               <div className="calendar-day-header">
                 <strong>
                   {date.toLocaleDateString(undefined, {
@@ -74,6 +51,7 @@ export default function Calendar({
                 <button
                   className="add-task-btn"
                   onClick={() => setAddingDate(dateStr)}
+                  type="button"
                 >
                   + Add
                 </button>
@@ -94,7 +72,6 @@ export default function Calendar({
         })}
       </div>
 
-      {/* Modal */}
       {addingDate && (
         <AddTaskForm
           date={addingDate}
@@ -105,7 +82,7 @@ export default function Calendar({
           onCancel={() => setAddingDate(null)}
         />
       )}
-    </DndContext>
+    </>
   );
 }
 
@@ -151,12 +128,16 @@ function DraggableTask({
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
       : undefined,
     opacity: isDragging ? 0.7 : 1,
-    cursor: "grab",
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-      <Task task={task} onUpdate={onUpdate} onToggle={onToggle} />
+    <div ref={setNodeRef} style={style}>
+      <Task
+        task={task}
+        onUpdate={onUpdate}
+        onToggle={onToggle}
+        dragHandleProps={{ ...listeners, ...attributes }}
+      />
     </div>
   );
 }

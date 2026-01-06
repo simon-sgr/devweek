@@ -1,11 +1,12 @@
 import { useState, FormEvent } from "react";
-import type { TaskData } from "./types";
+import type { TaskData, TaskStatus } from "./types";
 import "./AddTaskForm.css";
 
 interface AddTaskFormProps {
   onAddTask: (task: TaskData) => void;
   onCancel?: () => void;
   date?: string; // optional date to pre-fill the task date
+  status?: TaskStatus; // optional status to pre-fill the task status
 }
 
 const defaultPriority = "low";
@@ -14,6 +15,7 @@ export default function AddTaskForm({
   onAddTask,
   onCancel,
   date,
+  status,
 }: AddTaskFormProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -29,7 +31,8 @@ export default function AddTaskForm({
       description: description.trim() || undefined,
       completed: false,
       priority: priority as TaskData["priority"],
-      date: date ?? new Date().toISOString().slice(0, 10), // "YYYY-MM-DD"
+      date: date,
+      status: status,
     };
 
     onAddTask(newTask);

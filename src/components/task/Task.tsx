@@ -4,14 +4,14 @@ import "./Task.css";
 import { TaskData } from "./types";
 import TaskModal from "./TaskModal";
 
-type TaskProps = {
+interface TaskProps {
   task: TaskData;
   onToggle: (id: string) => void;
   onUpdate: (task: TaskData) => void;
-  onClose?: () => void;
-};
+  dragHandleProps?: React.HTMLAttributes<HTMLDivElement>;
+}
 
-const Task = ({ task, onToggle, onUpdate }: TaskProps) => {
+const Task = ({ task, onToggle, onUpdate, dragHandleProps }: TaskProps) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -22,6 +22,16 @@ const Task = ({ task, onToggle, onUpdate }: TaskProps) => {
         }`}
         onClick={() => setOpen(true)}
       >
+        <div
+          className="drag-handle"
+          {...dragHandleProps}
+          onClick={(e) => e.stopPropagation()} // prevent opening modal on drag handle click
+        >
+          <span />
+          <span />
+          <span />
+        </div>
+
         <input
           type="checkbox"
           checked={task.completed}
