@@ -1,0 +1,40 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: white;
+  padding: 20px;
+  width: 400px;
+  border-radius: 8px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal__priority {
+  font-size: 14px;
+}
+
+.modal__description {
+  font-size: 14px;
+  color: #374151;
+}
+
+.modal__links a {
+  margin-right: 12px;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.modal__links a:hover {
+  text-decoration: underline;
+}

@@ -1,50 +1,59 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import { useEffect, useState } from "react";
+import { TaskData } from "./components/task/types";
+import { TaskStore } from "./lib/TaskStore";
+import Calendar from "./components/calendar/Calendar";
+import { sortTasksByPriority } from "@/utils/taskUtils";
+
+const taskStore = new TaskStore();
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [tasks, setTasks] = useState<TaskData[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  useEffect(() => {
+    taskStore.loadTasks().then((loadedTasks) => {
+      setTasks(sortTasksByPriority(loadedTasks));
+      setLoaded(true);
+    });
+  }, []);
+
+  /* ---------- handlers ---------- */
+
+  const addTask = async (task: TaskData) => {
+    const updated = sortTasksByPriority([...tasks, task]);
+    setTasks(updated);
+    await taskStore.saveTasks(updated);
+  };
+
+  const updateTask = async (updatedTask: TaskData) => {
+    const updated = sortTasksByPriority(
+      tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t))
+    );
+    setTasks(updated);
+    await taskStore.saveTasks(updated);
+  };
+
+  const toggleTask = async (id: string) => {
+    const updated = sortTasksByPriority(
+      tasks.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
+    );
+    setTasks(updated);
+    await taskStore.saveTasks(updated);
+  };
+
+  if (!loaded) return <div>Loading…</div>;
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
+    <div style={{ padding: 24 }}>
+      <h1>DevWeek Planner</h1>
 
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+      <Calendar
+        tasks={tasks}
+        onAddTask={addTask}
+        onUpdateTask={updateTask}
+        onToggle={toggleTask}
+      />
+    </div>
   );
 }
 
