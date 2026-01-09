@@ -1,7 +1,11 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { useState } from "react";
 
-import { getCurrentWorkWeek } from "@/utils/dateUtils";
+import {
+  getCurrentWorkWeek,
+  getNextWorkWeek,
+  getPreviousWorkWeek,
+} from "@/utils/dateUtils";
 import { TaskData } from "../task/types";
 import Task from "../task/Task";
 import AddTaskForm from "../task/AddTaskForm";
@@ -20,56 +24,90 @@ export default function Calendar({
   onUpdateTask,
   onToggle,
 }: CalendarProps) {
-  const weekDays = getCurrentWorkWeek();
+  const [currentWeek, setCurrentWeek] = useState<Date[]>(getCurrentWorkWeek());
   const todayStr = new Date().toISOString().slice(0, 10);
 
-  const [addingDate, setAddingDate] = useState<string | null>(null);
+  console.log("Current week start:", currentWeek);
+  console.log("Week days:", currentWeek);
+  const [addingDate, setAddingDate] = useState<Date | null>(null);
+
+  const goToNextWeek = () => {
+    setCurrentWeek(getNextWorkWeek(currentWeek[0]));
+  };
+
+  const goToPreviousWeek = () => {
+    setCurrentWeek(getPreviousWorkWeek(currentWeek[0]));
+  };
+
+  const goToToday = () => {
+    setCurrentWeek(getCurrentWorkWeek());
+  };
 
   return (
     <>
-      <div className="calendar">
-        {weekDays.map((date) => {
-          const dateStr = date.toISOString().slice(0, 10);
-          const isToday = dateStr === todayStr;
-          const dayTasks = tasks.filter((t) => t.date === dateStr);
+      <div className="calendar-container">
+        <div className="calendar-navigation">
+          <button onClick={goToPreviousWeek} className="nav-btn">
+            ? Previous
+          </button>
+          <button onClick={goToToday} className="nav-btn today-btn">
+            Today
+          </button>
+          <button onClick={goToNextWeek} className="nav-btn">
+            Next ?
+          </button>
+        </div>
 
-          return (
-            <DroppableDay
-              key={dateStr}
-              id={`date:${dateStr}`}
-              isToday={isToday}
-            >
-              <div className="calendar-day-header">
-                <strong>
-                  {date.toLocaleDateString(undefined, {
-                    weekday: "short",
-                    day: "numeric",
-                    month: "short",
-                  })}
-                </strong>
+        <div className="calendar">
+          {currentWeek.map((date) => {
+            const dateStr = date.toISOString().slice(0, 10);
+            const isToday = dateStr === todayStr;
+            const dayTasks = tasks.filter((t) => {
+              if (!t.date || !date) return false;
 
-                <button
-                  className="add-task-btn"
-                  onClick={() => setAddingDate(dateStr)}
-                  type="button"
-                >
-                  + Add
-                </button>
-              </div>
+              const taskDate =
+                t.date instanceof Date ? t.date : new Date(t.date);
+              return taskDate.toDateString() === date.toDateString();
+            });
 
-              <div className="calendar-tasks">
-                {dayTasks.map((task) => (
-                  <DraggableTask
-                    key={task.id}
-                    task={task}
-                    onToggle={onToggle}
-                    onUpdate={onUpdateTask}
-                  />
-                ))}
-              </div>
-            </DroppableDay>
-          );
-        })}
+            return (
+              <DroppableDay
+                key={dateStr}
+                id={`date:${dateStr}`}
+                isToday={isToday}
+              >
+                <div className="calendar-day-header">
+                  <strong>
+                    {date.toLocaleDateString(undefined, {
+                      weekday: "short",
+                      day: "numeric",
+                      month: "short",
+                    })}
+                  </strong>
+
+                  <button
+                    className="add-task-btn"
+                    onClick={() => setAddingDate(new Date(dateStr))}
+                    type="button"
+                  >
+                    + Add
+                  </button>
+                </div>
+
+                <div className="calendar-tasks">
+                  {dayTasks.map((task) => (
+                    <DraggableTask
+                      key={task.id}
+                      task={task}
+                      onToggle={onToggle}
+                      onUpdate={onUpdateTask}
+                    />
+                  ))}
+                </div>
+              </DroppableDay>
+            );
+          })}
+        </div>
       </div>
 
       {addingDate && (

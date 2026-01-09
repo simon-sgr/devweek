@@ -1,20 +1,9 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { open } from "@tauri-apps/plugin-shell";
 import "./TaskModal.css";
 import { TaskData, Priority } from "./types";
-
-/** Turns URLs into clickable <a> links */
-function linkify(text: string) {
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-  return text.split(urlRegex).map((part, i) =>
-    urlRegex.test(part) ? (
-      <a key={i} href={part} target="_blank" rel="noopener noreferrer">
-        {part}
-      </a>
-    ) : (
-      part
-    )
-  );
-}
 
 type Props = {
   task: TaskData;
@@ -23,12 +12,26 @@ type Props = {
 };
 
 export default function TaskModal({ task, onClose, onSave }: Props) {
+  const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description ?? "");
   const [priority, setPriority] = useState<Priority>(task.priority);
+  const [isPreview, setIsPreview] = useState(false);
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === "A") {
+      e.preventDefault();
+      const href = target.getAttribute("href");
+      if (href) {
+        open(href);
+      }
+    }
+  };
 
   const handleSave = () => {
     onSave({
       ...task,
+      title: title.trim() || task.title,
       description: description || undefined,
       priority,
     });
@@ -39,7 +42,13 @@ export default function TaskModal({ task, onClose, onSave }: Props) {
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <header className="modal-header">
-          <h2>{task.title}</h2>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="title-input"
+            placeholder="Task title"
+          />
         </header>
 
         <div className="modal-body">
@@ -57,21 +66,34 @@ export default function TaskModal({ task, onClose, onSave }: Props) {
           </label>
 
           <label>
-            <span className="label">Description</span>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={5}
-              placeholder="Add details, links, notes…"
-            />
-          </label>
-
-          {description && (
-            <div className="description-preview">
-              <span className="label">Preview</span>
-              <p>{linkify(description)}</p>
+            <div className="description-header">
+              <span className="label">Description</span>
+              {description && (
+                <button
+                  type="button"
+                  onClick={() => setIsPreview(!isPreview)}
+                  className="preview-toggle"
+                  title={isPreview ? "Edit" : "Preview"}
+                >
+                  {isPreview ? "Edit" : "Preview"}
+                </button>
+              )}
             </div>
-          )}
+            {isPreview ? (
+              <div className="description-preview" onClick={handleLinkClick}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {description}
+                </ReactMarkdown>
+              </div>
+            ) : (
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={5}
+                placeholder="Add details, links, notes... (supports markdown: **bold**, *italic*, [links](url), # headers, etc.)"
+              />
+            )}
+          </label>
         </div>
 
         <footer className="modal-actions">

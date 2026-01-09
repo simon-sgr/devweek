@@ -76,7 +76,7 @@ export default function TaskBoard() {
     if (overId.startsWith("date:")) {
       // Dropped on a calendar day ? update date, clear status
       const newDate = overId.replace("date:", "");
-      updatedTask.date = newDate;
+      updatedTask.date = new Date(newDate);
       updatedTask.status = undefined;
     } else if (overId.startsWith("status:")) {
       // Dropped on Kanban column ? clear date, update status

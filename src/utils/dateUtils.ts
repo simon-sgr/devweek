@@ -15,6 +15,34 @@ export function getCurrentWorkWeek(): Date[] {
     return d;
   });
 }
+
+export function getNextWorkWeek(startDate: Date): Date[] {
+  const nextWeekStart = new Date(startDate);
+  nextWeekStart.setDate(startDate.getDate() + 7);
+  const day = nextWeekStart.getDay();
+  const monday = new Date(nextWeekStart);
+  monday.setDate(nextWeekStart.getDate() - (day === 0 ? 6 : day - 1));
+
+  return Array.from({ length: 5 }, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return d;
+  });
+}
+
+export function getPreviousWorkWeek(startDate: Date): Date[] {
+  const prevWeekStart = new Date(startDate);
+  prevWeekStart.setDate(startDate.getDate() - 7);
+  const day = prevWeekStart.getDay();
+  const monday = new Date(prevWeekStart);
+  monday.setDate(prevWeekStart.getDate() - (day === 0 ? 6 : day - 1));
+  return Array.from({ length: 5 }, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return d;
+  });
+}
+
 export function formatDate(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");

@@ -1,12 +1,15 @@
-import { useState, FormEvent } from "react";
+import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { open } from "@tauri-apps/plugin-shell";
 import type { TaskData, TaskStatus } from "./types";
 import "./AddTaskForm.css";
 
 interface AddTaskFormProps {
   onAddTask: (task: TaskData) => void;
   onCancel?: () => void;
-  date?: string; // optional date to pre-fill the task date
-  status?: TaskStatus; // optional status to pre-fill the task status
+  date?: Date;
+  status?: TaskStatus;
 }
 
 const defaultPriority = "low";
@@ -20,10 +23,27 @@ export default function AddTaskForm({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState(defaultPriority);
+  const [isPreview, setIsPreview] = useState(false);
+  const [error, setError] = useState("");
 
-  function handleSubmit(e: FormEvent) {
+  const handleLinkClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === "A") {
+      e.preventDefault();
+      const href = target.getAttribute("href");
+      if (href) {
+        open(href);
+      }
+    }
+  };
+
+  function handleSubmit(e: React.MouseEvent) {
     e.preventDefault();
-    if (!title.trim()) return alert("Title is required");
+
+    if (!title.trim()) {
+      setError("Title is required");
+      return;
+    }
 
     const newTask: TaskData = {
       id: crypto.randomUUID(),
@@ -40,77 +60,83 @@ export default function AddTaskForm({
     setTitle("");
     setDescription("");
     setPriority(defaultPriority);
+    setIsPreview(false);
+    setError("");
   }
 
   return (
-    <Modal onClose={onCancel}>
-      <form
-        className="add-task-form"
-        onSubmit={handleSubmit}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h3>Add New Task</h3>
-        <label className="form-label">
-          Title*:
+    <div className="modal-backdrop" onClick={onCancel}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <header className="modal-header">
           <input
-            className="form-input"
             type="text"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
+            onChange={(e) => {
+              setTitle(e.target.value);
+              if (error) setError("");
+            }}
+            className="title-input"
             placeholder="Task title"
           />
-        </label>
+          {error && <div className="error-message">{error}</div>}
+        </header>
 
-        <label className="form-label">
-          Description:
-          <textarea
-            className="form-textarea"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={4}
-            placeholder="Optional detailed description"
-          />
-        </label>
+        <div className="modal-body">
+          <label>
+            <span className="label">Priority</span>
+            <select
+              value={priority}
+              onChange={(e) => setPriority(e.target.value)}
+              className={`priority-select ${priority}`}
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </label>
 
-        <label className="form-label">
-          Priority:
-          <select
-            className="form-select"
-            value={priority}
-            onChange={(e) => setPriority(e.target.value)}
-          >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
-        </label>
+          <label>
+            <div className="description-header">
+              <span className="label">Description</span>
+              {description && (
+                <button
+                  type="button"
+                  onClick={() => setIsPreview(!isPreview)}
+                  className="preview-toggle"
+                  title={isPreview ? "Edit" : "Preview"}
+                >
+                  {isPreview ? "Edit" : "Preview"}
+                </button>
+              )}
+            </div>
+            {isPreview ? (
+              <div className="description-preview" onClick={handleLinkClick}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {description}
+                </ReactMarkdown>
+              </div>
+            ) : (
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={5}
+                placeholder="Add details, links, notes... (supports markdown: **bold**, *italic*, [links](url), # headers, etc.)"
+              />
+            )}
+          </label>
+        </div>
 
-        <div className="form-buttons">
+        <footer className="modal-actions">
           {onCancel && (
-            <button type="button" className="btn btn-cancel" onClick={onCancel}>
+            <button onClick={onCancel} className="btn">
               Cancel
             </button>
           )}
-          <button type="submit" className="btn btn-submit">
+          <button onClick={handleSubmit} className="btn primary">
             Add Task
           </button>
-        </div>
-      </form>
-    </Modal>
-  );
-}
-
-function Modal({
-  children,
-  onClose,
-}: {
-  children: React.ReactNode;
-  onClose?: () => void;
-}) {
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      {children}
+        </footer>
+      </div>
     </div>
   );
 }
