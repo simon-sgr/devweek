@@ -10,6 +10,7 @@ import { TaskData } from "../task/types";
 import Task from "../task/Task";
 import AddTaskForm from "../task/AddTaskForm";
 import "./Calendar.css";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 
 interface CalendarProps {
   tasks: TaskData[];
@@ -48,13 +49,13 @@ export default function Calendar({
       <div className="calendar-container">
         <div className="calendar-navigation">
           <button onClick={goToPreviousWeek} className="nav-btn">
-            ? Previous
+            <ChevronLeft size={20} /> Previous
           </button>
           <button onClick={goToToday} className="nav-btn today-btn">
             Today
           </button>
           <button onClick={goToNextWeek} className="nav-btn">
-            Next ?
+            Next <ChevronRight size={20} />
           </button>
         </div>
 
@@ -90,7 +91,7 @@ export default function Calendar({
                     onClick={() => setAddingDate(new Date(dateStr))}
                     type="button"
                   >
-                    + Add
+                    <Plus size={16} /> Add Task
                   </button>
                 </div>
 

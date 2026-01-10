@@ -49,4 +49,13 @@ export class TaskStore {
     const filtered = tasks.filter((t) => t.id !== taskId);
     await this.saveTasks(filtered);
   }
+
+  async exportTasks(): Promise<string> {
+    const tasks = await this.loadTasks();
+    return JSON.stringify(tasks, null, 2);
+  }
+  async importTasks(jsonData: string): Promise<void> {
+    const tasks: TaskData[] = JSON.parse(jsonData);
+    await this.saveTasks(tasks);
+  }
 }

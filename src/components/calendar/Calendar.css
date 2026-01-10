@@ -99,8 +99,16 @@
   color: #007bff;
   cursor: pointer;
   font-size: 14px;
+  align-items: center;
+  display: flex;
 }
 
 .add-task-btn:hover {
   text-decoration: underline;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }

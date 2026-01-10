@@ -18,9 +18,11 @@
     "@tauri-apps/plugin-shell": "^2.3.4",
     "@tauri-apps/plugin-store": "^2.4.1",
     "date-fns": "^4.1.0",
+    "lucide-react": "^0.562.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-markdown": "^10.1.0",
+    "recharts": "^3.6.0",
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {

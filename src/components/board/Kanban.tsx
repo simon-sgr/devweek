@@ -4,6 +4,7 @@ import { useDroppable, useDraggable } from "@dnd-kit/core";
 import "./Kanban.css";
 import { useState } from "react";
 import AddTaskForm from "../task/AddTaskForm";
+import { Plus } from "lucide-react";
 
 interface KanbanProps {
   tasks: TaskData[];
@@ -88,7 +89,7 @@ function KanbanColumn({
             onClick={() => setAddingStatusTask(id.replace("status:", ""))}
             type="button"
           >
-            + Add
+            <Plus size={16} /> Add Task
           </button>
         </div>
         <div className="kanban-tasks">

@@ -96,7 +96,7 @@ export default function TaskBoard() {
 
   const sensors = useSensors(useSensor(PointerSensor));
 
-  if (!loaded) return <div>Loading…</div>;
+  if (!loaded) return <div>Loading</div>;
 
   // Separate calendar tasks (have a date) and kanban tasks (no date)
   console.log("Rendering TaskBoard with tasks:", tasks);
