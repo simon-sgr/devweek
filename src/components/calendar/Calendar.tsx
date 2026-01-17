@@ -9,7 +9,7 @@ import {
 import { TaskData } from "../task/types";
 import Task from "../task/Task";
 import AddTaskForm from "../task/AddTaskForm";
-import "./Calendar.css";
+import "../../styles/TaskHolder.css";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 
 interface CalendarProps {

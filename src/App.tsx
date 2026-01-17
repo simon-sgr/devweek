@@ -5,7 +5,7 @@ import TaskBoard from "./TaskBoard";
 import Setting from "./Setting";
 import "./App.css";
 import Statistic from "./Statistic";
-import logo from "./assets/devweek-logo.svg";
+import logo from "./assets/devweek_txt_logo.svg";
 
 function App() {
   const [activeView, setActiveView] = useState("board");

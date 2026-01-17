@@ -1,7 +1,15 @@
+/* Hide all scrollbars */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
 /* App Layout */
 .app-container {
   display: flex;
   height: 100vh;
+  box-sizing: border-box;
+  border: 3px;
   background: #f9fafb;
 }
 

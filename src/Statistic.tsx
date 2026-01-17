@@ -17,8 +17,11 @@ import { TaskData } from "./components/task/types";
 
 const taskStore = new TaskStore();
 
+type TimePeriod = "week" | "month" | "year" | "all";
+
 export default function Statistic() {
   const [tasks, setTasks] = useState<TaskData[]>([]);
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>("all");
 
   useEffect(() => {
     loadTasks();
@@ -29,10 +32,38 @@ export default function Statistic() {
     setTasks(loadedTasks);
   };
 
+  // Filter tasks based on selected time period
+  const getFilteredTasks = () => {
+    if (timePeriod === "all") return tasks;
+
+    const now = new Date();
+    const startDate = new Date();
+
+    switch (timePeriod) {
+      case "week":
+        startDate.setDate(now.getDate() - 7);
+        break;
+      case "month":
+        startDate.setMonth(now.getMonth() - 1);
+        break;
+      case "year":
+        startDate.setFullYear(now.getFullYear() - 1);
+        break;
+    }
+
+    return tasks.filter((task) => {
+      if (!task.date) return false;
+      const taskDate = new Date(task.date);
+      return taskDate >= startDate && taskDate <= now;
+    });
+  };
+
+  const filteredTasks = getFilteredTasks();
+
   // Calculate statistics
-  const totalTasks = tasks.length;
-  const completedTasks = tasks.filter((t) => t.completed).length;
-  const pendingTasks = tasks.filter((t) => !t.completed).length;
+  const totalTasks = filteredTasks.length;
+  const completedTasks = filteredTasks.filter((t) => t.completed).length;
+  const pendingTasks = filteredTasks.filter((t) => !t.completed).length;
   const completionRate =
     totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
@@ -45,7 +76,7 @@ export default function Statistic() {
   // Tasks by day of week
   const dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
   const tasksByDay = dayNames.map((day) => {
-    const count = tasks.filter((task) => {
+    const count = filteredTasks.filter((task) => {
       if (!task.date) return false;
       const taskDate = new Date(task.date);
       const taskDayIndex = taskDate.getDay();
@@ -60,24 +91,54 @@ export default function Statistic() {
   const priorityData = [
     {
       name: "High",
-      value: tasks.filter((t) => t.priority === "high").length,
+      value: filteredTasks.filter((t) => t.priority === "high").length,
       color: "#ef4444",
     },
     {
       name: "Medium",
-      value: tasks.filter((t) => t.priority === "medium").length,
+      value: filteredTasks.filter((t) => t.priority === "medium").length,
       color: "#f59e0b",
     },
     {
       name: "Low",
-      value: tasks.filter((t) => t.priority === "low").length,
+      value: filteredTasks.filter((t) => t.priority === "low").length,
       color: "#10b981",
     },
   ];
 
   return (
     <div className="statistics-container">
-      <h2>Statistics</h2>
+      <div className="stats-header">
+        <h2>Statistics</h2>
+
+        {/* Time Period Selector */}
+        <div className="time-period-selector">
+          <button
+            className={timePeriod === "week" ? "active" : ""}
+            onClick={() => setTimePeriod("week")}
+          >
+            This Week
+          </button>
+          <button
+            className={timePeriod === "month" ? "active" : ""}
+            onClick={() => setTimePeriod("month")}
+          >
+            This Month
+          </button>
+          <button
+            className={timePeriod === "year" ? "active" : ""}
+            onClick={() => setTimePeriod("year")}
+          >
+            This Year
+          </button>
+          <button
+            className={timePeriod === "all" ? "active" : ""}
+            onClick={() => setTimePeriod("all")}
+          >
+            All Time
+          </button>
+        </div>
+      </div>
 
       {/* Overview Cards */}
       <div className="stats-cards">

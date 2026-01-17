@@ -1,7 +1,7 @@
 import { TaskData } from "../task/types";
 import Task from "../task/Task";
 import { useDroppable, useDraggable } from "@dnd-kit/core";
-import "./Kanban.css";
+import "../../styles/TaskHolder.css";
 import { useState } from "react";
 import AddTaskForm from "../task/AddTaskForm";
 import { Plus } from "lucide-react";
@@ -35,7 +35,7 @@ export default function Kanban({
       });
       return acc;
     },
-    {}
+    {},
   );
 
   return (

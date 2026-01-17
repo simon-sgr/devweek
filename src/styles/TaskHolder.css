@@ -1,0 +1,651 @@
+/* ==================== SHARED VARIABLES ==================== */
+:root {
+  --primary-color: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-light: #dbeafe;
+  --primary-lighter: #eff6ff;
+  
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+  
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  
+  --border-color: #e2e8f0;
+  --border-hover: #cbd5e1;
+  
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-tertiary: #94a3b8;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+/* ==================== KANBAN BOARD ==================== */
+.kanban {
+  display: flex;
+  gap: 16px;
+  background: var(--bg-secondary);
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  min-height: 300px;
+  overflow-x: auto;
+}
+
+.kanban-column {
+  flex: 1 1 300px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  max-height: 600px;
+  overflow-y: auto;
+  transition: all 0.2s ease;
+}
+
+.kanban-column:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-hover);
+}
+
+.kanban-column.drag-over {
+  border: 2px dashed var(--primary-color);
+  background-color: var(--primary-lighter);
+}
+
+.kanban-column h3 {
+  margin: 0 0 16px 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kanban-tasks {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.no-tasks {
+  color: var(--text-tertiary);
+  font-style: italic;
+  user-select: none;
+  padding: 24px 0;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.task-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  box-shadow: var(--shadow-sm);
+  cursor: grab;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.task-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+}
+
+.task-card:active {
+  cursor: grabbing;
+  box-shadow: var(--shadow-lg);
+  transform: scale(1.02);
+}
+
+.kanban-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.kanban-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.kanban-header:hover::before {
+  opacity: 1;
+}
+
+.kanban-header:hover {
+  border-color: var(--primary-light);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Kanban Column Title Styling */
+.kanban-header strong {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.875rem;
+}
+
+/* Status indicator dot (optional - can be added via React) */
+.kanban-header strong::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  display: inline-block;
+}
+
+/* Compact add button in kanban header */
+.kanban-header .add-task-btn {
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  gap: 4px;
+  width: auto;
+  white-space: nowrap;
+  border-width: 1.5px;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.kanban-header .add-task-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.15);
+}
+
+.kanban-header .add-task-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Different colors for different status columns */
+.kanban-column[data-status="todo"] .kanban-header strong::before {
+  background: #6366f1; /* Indigo */
+}
+
+.kanban-column[data-status="in-progress"] .kanban-header strong::before,
+.kanban-column[data-status="in_progress"] .kanban-header strong::before {
+  background: #f59e0b; /* Amber */
+}
+
+.kanban-column[data-status="done"] .kanban-header strong::before,
+.kanban-column[data-status="completed"] .kanban-header strong::before {
+  background: #10b981; /* Green */
+}
+
+.kanban-column[data-status="blocked"] .kanban-header strong::before {
+  background: #ef4444; /* Red */
+}
+
+/* ==================== CALENDAR ==================== */
+.calendar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.calendar-navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-btn:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-btn.today-btn {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.nav-btn.today-btn:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.calendar {
+  display: flex;
+  gap: 12px;
+  overscroll-behavior: contain;
+}
+
+.calendar-day {
+  flex: 1;
+  min-height: 150px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+}
+
+.calendar-day:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-hover);
+}
+
+.calendar-day.today {
+  background-color: var(--primary-lighter);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.calendar-day.droppable-over {
+  background-color: var(--primary-light);
+  border: 2px dashed var(--primary-color);
+}
+
+/* Modern Attractive Calendar Day Header */
+.calendar-day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.calendar-day-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.calendar-day-header:hover::before {
+  opacity: 1;
+}
+
+.calendar-day-header:hover {
+  border-color: var(--primary-light);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Date Display Styling */
+.calendar-day-header strong {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.2;
+  position: relative;
+  z-index: 1;
+}
+
+/* Split date parts for better styling */
+.calendar-date-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.calendar-weekday {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--primary-color);
+}
+
+.calendar-date-month {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.calendar-day-number {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.calendar-month-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Compact add button in header */
+.calendar-day-header .add-task-btn {
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  gap: 4px;
+  width: auto;
+  white-space: nowrap;
+  border-width: 1.5px;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.calendar-day-header .add-task-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.15);
+}
+
+.calendar-day-header .add-task-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Today's header special styling */
+.calendar-day.today .calendar-day-header {
+  background: linear-gradient(135deg, var(--primary-lighter) 0%, #ffffff 100%);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.calendar-day.today .calendar-day-header::before {
+  opacity: 1;
+  width: 4px;
+  background: linear-gradient(180deg, #3b82f6 0%, #8b5cf6 100%);
+}
+
+.calendar-day.today .calendar-weekday {
+  color: var(--primary-hover);
+}
+
+.calendar-day.today .calendar-day-number {
+  color: var(--primary-hover);
+  font-size: 1.35rem;
+}
+
+/* Alternative Style 1: Badge Style */
+.calendar-day-header.badge-style {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-bottom: 12px;
+}
+
+.calendar-day-header.badge-style .calendar-date-wrapper {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.calendar-day-header.badge-style .calendar-weekday {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.calendar-day-header.badge-style .calendar-day-number,
+.calendar-day-header.badge-style .calendar-month-name {
+  color: white;
+}
+
+/* Alternative Style 2: Minimal Clean */
+.calendar-day-header.minimal {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--border-color);
+  border-radius: 0;
+  padding: 8px 0;
+  margin-bottom: 12px;
+}
+
+.calendar-day-header.minimal:hover {
+  border-bottom-color: var(--primary-color);
+  transform: none;
+  box-shadow: none;
+}
+
+/* Alternative Style 3: Card Style */
+.calendar-day-header.card-style {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-day-header.card-style .add-task-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.calendar-day-header.card-style .calendar-date-wrapper {
+  width: 100%;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.calendar-tasks {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 80px;
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  overflow-y: auto;
+}
+
+/* ==================== SHARED COMPONENTS ==================== */
+.add-task-btn {
+  border: none;
+  background: transparent;
+  color: var(--primary-color);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  align-items: center;
+  display: flex;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.add-task-btn:hover {
+  background: var(--primary-lighter);
+  color: var(--primary-hover);
+}
+
+/* ==================== SCROLLBAR STYLING ==================== */
+.kanban-column::-webkit-scrollbar,
+.calendar-tasks::-webkit-scrollbar {
+  width: 6px;
+}
+
+.kanban-column::-webkit-scrollbar-track,
+.calendar-tasks::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.kanban-column::-webkit-scrollbar-thumb,
+.calendar-tasks::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.kanban-column::-webkit-scrollbar-thumb:hover,
+.calendar-tasks::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+@media (max-width: 768px) {
+  .kanban {
+    padding: 12px;
+    gap: 12px;
+  }
+  
+  .kanban-column {
+    flex: 1 1 250px;
+    padding: 12px;
+  }
+  
+  .calendar {
+    flex-direction: column;
+  }
+  
+  .calendar-day {
+    min-height: 120px;
+  }
+  
+  .calendar-navigation {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .calendar-day-header {
+    padding: 10px 12px;
+  }
+  
+  .calendar-day-header .add-task-btn {
+    padding: 5px 8px;
+    font-size: 0.7rem;
+  }
+  
+  .calendar-day-header .add-task-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .calendar-day-number {
+    font-size: 1.1rem;
+  }
+}
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.task-card {
+  animation: slideIn 0.2s ease-out;
+}
+
+/* ==================== DARK MODE SUPPORT (Optional) ==================== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #1e293b;
+    --bg-secondary: #0f172a;
+    --bg-tertiary: #334155;
+    
+    --border-color: #334155;
+    --border-hover: #475569;
+    
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #64748b;
+  }
+  
+  .task-card,
+  .kanban-column,
+  .calendar-day {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  }
+  
+  .calendar-day-header,
+  .kanban-header {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-color: #334155;
+  }
+  
+  .calendar-day.today .calendar-day-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e293b 100%);
+    border-color: #3b82f6;
+  }
+  
+  .calendar-day-header .add-task-btn,
+  .kanban-header .add-task-btn {
+    background: #1e293b;
+  }
+}

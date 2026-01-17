@@ -3,7 +3,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { open } from "@tauri-apps/plugin-shell";
 import type { TaskData, TaskStatus } from "./types";
-import "./AddTaskForm.css";
+import "../../styles/TaskInfo.css";
 
 interface AddTaskFormProps {
   onAddTask: (task: TaskData) => void;

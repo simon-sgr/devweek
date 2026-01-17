@@ -74,7 +74,7 @@ export default function Settings() {
       await taskStore.importTasks(text);
 
       setImportStatus(
-        "Tasks imported successfully! Refresh the page to see changes."
+        "Tasks imported successfully! Refresh the page to see changes.",
       );
       setTimeout(() => setImportStatus(""), 5000);
     } catch (error) {
@@ -96,7 +96,7 @@ export default function Settings() {
     try {
       await taskStore.saveTasks([]);
       setDeleteStatus(
-        "All tasks deleted successfully! Refresh the page to see changes."
+        "All tasks deleted successfully! Refresh the page to see changes.",
       );
       setShowDeleteConfirm(false);
       setTimeout(() => setDeleteStatus(""), 5000);
