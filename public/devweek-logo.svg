@@ -1,0 +1,56 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="#3b82f6" opacity="0.1"/>
+  
+  <!-- Main container -->
+  <g transform="translate(100, 100)">
+    <!-- Calendar grid background -->
+    <rect x="-50" y="-45" width="100" height="90" rx="8" fill="#3b82f6"/>
+    
+    <!-- Calendar header -->
+    <rect x="-50" y="-45" width="100" height="20" rx="8" fill="#2563eb"/>
+    
+    <!-- Calendar dots (days) -->
+    <g fill="white" opacity="0.5">
+      <!-- Row 1 -->
+      <circle cx="-35" cy="-15" r="3"/>
+      <circle cx="-20" cy="-15" r="3"/>
+      <circle cx="-5" cy="-15" r="3"/>
+      <circle cx="10" cy="-15" r="3"/>
+      <circle cx="25" cy="-15" r="3"/>
+      
+      <!-- Row 2 -->
+      <circle cx="-35" cy="0" r="3"/>
+      <circle cx="-20" cy="0" r="3"/>
+      <circle cx="-5" cy="0" r="3"/>
+      <circle cx="10" cy="0" r="3"/>
+      <circle cx="25" cy="0" r="3"/>
+      
+      <!-- Row 3 -->
+      <circle cx="-35" cy="15" r="3"/>
+      <circle cx="-20" cy="15" r="3"/>
+      <circle cx="-5" cy="15" r="3"/>
+      <circle cx="10" cy="15" r="3"/>
+      <circle cx="25" cy="15" r="3"/>
+    </g>
+    
+    <!-- Highlighted day (current) -->
+    <circle cx="10" cy="0" r="5" fill="#10b981"/>
+    
+    <!-- Code brackets -->
+    <g stroke="#ffffff" stroke-width="4" fill="none" stroke-linecap="round">
+      <path d="M -70,-30 L -80,-30 L -80,30 L -70,30"/>
+      <path d="M 70,-30 L 80,-30 L 80,30 L 70,30"/>
+    </g>
+    
+    <!-- Check mark overlay -->
+    <g transform="translate(25, 15)">
+      <circle r="12" fill="#10b981"/>
+      <path d="M -4,0 L -1,4 L 5,-4" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+  
+  <!-- Text -->
+  <text x="100" y="175" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#1f2937" text-anchor="middle">DevWeek</text>
+  <text x="100" y="192" font-family="Arial, sans-serif" font-size="12" fill="#6b7280" text-anchor="middle">PLANNER</text>
+</svg>
