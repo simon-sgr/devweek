@@ -20,12 +20,13 @@ const Task = ({ task, onToggle, onUpdate, dragHandleProps }: TaskProps) => {
         className={`task task--${task.priority} ${
           task.completed ? "task--completed" : ""
         }`}
+        {...dragHandleProps}
         onClick={() => setOpen(true)}
       >
         <div
           className="drag-handle"
-          {...dragHandleProps}
-          onClick={(e) => e.stopPropagation()} // prevent opening modal on drag handle click
+          aria-hidden="true"
+          onClick={(e) => e.stopPropagation()}
         >
           <span />
           <span />

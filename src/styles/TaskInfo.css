@@ -2,8 +2,8 @@
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(8px);
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(18px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13,14 +13,14 @@
 
 /* ==================== MODAL CONTAINER ==================== */
 .modal {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  width: 520px;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-elevated) 100%);
+  width: 560px;
   max-width: 90%;
-  border-radius: 16px;
+  border-radius: 26px;
   box-shadow: 
-    0 24px 60px rgba(0, 0, 0, 0.15),
-    0 0 0 1px rgba(0, 0, 0, 0.05),
-    0 0 0 4px rgba(59, 130, 246, 0.1);
+    0 28px 70px rgba(15, 23, 42, 0.22),
+    0 0 0 1px rgba(59, 130, 246, 0.08),
+    0 0 0 6px rgba(59, 130, 246, 0.06);
   display: flex;
   flex-direction: column;
   animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -41,16 +41,16 @@
 
 /* ==================== MODAL HEADER ==================== */
 .modal-header {
-  padding: 28px 28px 20px;
+  padding: 30px 30px 18px;
   border-bottom: 1px solid var(--border-color, #e2e8f0);
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.5));
+  background: linear-gradient(to bottom, var(--surface), var(--surface-elevated));
 }
 
 .title-input {
   width: 100%;
   border: none;
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 26px;
+  font-weight: 800;
   padding: 0 0 8px 0;
   margin: 0;
   font-family: inherit;
@@ -74,10 +74,10 @@
 .error-message {
   margin-top: 12px;
   padding: 12px 16px;
-  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(239, 68, 68, 0.12) 100%);
   border: 1px solid var(--danger-color, #ef4444);
   border-left: 4px solid var(--danger-color, #ef4444);
-  border-radius: 8px;
+  border-radius: 12px;
   color: #991b1b;
   font-size: 13px;
   font-weight: 600;
@@ -147,16 +147,16 @@
 }
 
 .preview-toggle {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-elevated) 100%);
   border: 1.5px solid var(--border-color, #e2e8f0);
   cursor: pointer;
   font-size: 12px;
   padding: 6px 14px;
-  border-radius: 6px;
+  border-radius: 999px;
   transition: all 0.2s ease;
   color: var(--primary-color, #3b82f6);
   font-weight: 700;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.05));
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -181,15 +181,16 @@ input[type="date"],
 input[type="time"] {
   width: 100%;
   padding: 12px 14px;
-  border-radius: 10px;
+  border-radius: 16px;
   border: 2px solid var(--border-color, #e2e8f0);
   font-size: 14px;
   font-family: inherit;
-  background: #ffffff;
+  background: var(--surface);
   transition: all 0.3s ease;
   color: var(--text-primary, #1e293b);
   font-weight: 500;
   box-sizing: border-box;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 textarea:focus,
@@ -233,8 +234,8 @@ textarea::placeholder {
 
 .priority-select.low {
   border-color: var(--success-color, #10b981);
-  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
-  color: #047857;
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(16, 185, 129, 0.12) 100%);
+  color: var(--text-primary);
 }
 
 .priority-select.low:focus {
@@ -244,8 +245,8 @@ textarea::placeholder {
 
 .priority-select.medium {
   border-color: var(--warning-color, #f59e0b);
-  background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
-  color: #d97706;
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(245, 158, 11, 0.12) 100%);
+  color: var(--text-primary);
 }
 
 .priority-select.medium:focus {
@@ -255,8 +256,8 @@ textarea::placeholder {
 
 .priority-select.high {
   border-color: var(--danger-color, #ef4444);
-  background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
-  color: #dc2626;
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(239, 68, 68, 0.12) 100%);
+  color: var(--text-primary);
 }
 
 .priority-select.high:focus {
@@ -294,8 +295,8 @@ textarea::placeholder {
 
 /* ==================== DESCRIPTION PREVIEW ==================== */
 .description-preview {
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  border-radius: 10px;
+  background: linear-gradient(135deg, var(--surface-elevated) 0%, var(--surface) 100%);
+  border-radius: 16px;
   padding: 16px;
   font-size: 14px;
   word-break: break-word;
@@ -372,21 +373,21 @@ textarea::placeholder {
 }
 
 .description-preview code {
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  background: linear-gradient(135deg, var(--surface-muted) 0%, var(--surface-soft) 100%);
   padding: 4px 8px;
-  border-radius: 5px;
+  border-radius: 8px;
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 13px;
-  color: #dc2626;
+  color: #f87171;
   font-weight: 600;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color, #e2e8f0);
 }
 
 .description-preview pre {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(135deg, var(--surface-elevated) 0%, var(--surface-muted) 100%);
   border: 2px solid var(--border-color, #e2e8f0);
   padding: 14px;
-  border-radius: 10px;
+  border-radius: 16px;
   overflow-x: auto;
   margin: 12px 0;
 }
@@ -406,23 +407,23 @@ textarea::placeholder {
   font-style: italic;
   background: linear-gradient(135deg, var(--primary-lighter, #eff6ff) 0%, transparent 100%);
   padding: 12px 16px;
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 12px 12px 0;
 }
 
 /* ==================== MODAL ACTIONS ==================== */
 .modal-actions {
-  padding: 20px 28px;
+  padding: 20px 30px 24px;
   display: flex;
   justify-content: flex-end;
   gap: 12px;
   border-top: 1px solid var(--border-color, #e2e8f0);
-  background: linear-gradient(to top, rgba(248, 250, 252, 0.8), rgba(255, 255, 255, 0.4));
+  background: linear-gradient(to top, var(--surface-elevated), var(--surface));
 }
 
 /* ==================== BUTTONS ==================== */
 .btn {
   padding: 11px 24px;
-  border-radius: 8px;
+  border-radius: 999px;
   border: none;
   cursor: pointer;
   font-size: 14px;
@@ -454,13 +455,13 @@ textarea::placeholder {
 }
 
 .btn:not(.primary) {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-elevated) 100%);
   color: var(--text-secondary, #64748b);
   border: 2px solid var(--border-color, #e2e8f0);
 }
 
 .btn:not(.primary):hover {
-  background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f4 100%);
+  background: linear-gradient(135deg, var(--surface-elevated) 0%, var(--surface-muted) 100%);
   border-color: var(--text-secondary, #64748b);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
@@ -537,38 +538,3 @@ textarea::placeholder {
   }
 }
 
-/* ==================== DARK MODE SUPPORT ==================== */
-@media (prefers-color-scheme: dark) {
-  .modal {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    box-shadow: 
-      0 24px 60px rgba(0, 0, 0, 0.5),
-      0 0 0 1px rgba(255, 255, 255, 0.1),
-      0 0 0 4px rgba(59, 130, 246, 0.2);
-  }
-  
-  .modal-header {
-    background: linear-gradient(to bottom, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.5));
-    border-bottom-color: #334155;
-  }
-  
-  textarea,
-  select,
-  input[type="text"],
-  input[type="date"],
-  input[type="time"] {
-    background: #0f172a;
-    border-color: #334155;
-    color: #f1f5f9;
-  }
-  
-  .description-preview {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    border-color: #334155;
-  }
-  
-  .modal-actions {
-    background: linear-gradient(to top, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.4));
-    border-top-color: #334155;
-  }
-}

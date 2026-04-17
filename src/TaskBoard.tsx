@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
+  type CollisionDetection,
   closestCenter,
   DndContext,
   DragEndEvent,
   PointerSensor,
+  pointerWithin,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -19,14 +21,24 @@ export default function TaskBoard() {
   const [tasks, setTasks] = useState<TaskData[]>([]);
   const [loaded, setLoaded] = useState(false);
 
-  useEffect(() => {
-    async function load() {
-      const loadedTasks = await taskStore.loadTasks();
-      setTasks(sortTasks(loadedTasks));
-      setLoaded(true);
-    }
-    load();
+  const loadTasks = useCallback(async () => {
+    const loadedTasks = await taskStore.loadTasks();
+    setTasks(sortTasks(loadedTasks));
+    setLoaded(true);
   }, []);
+
+  useEffect(() => {
+    loadTasks();
+
+    const handleTasksChanged = () => {
+      loadTasks();
+    };
+
+    window.addEventListener("tasks:changed", handleTasksChanged);
+    return () => {
+      window.removeEventListener("tasks:changed", handleTasksChanged);
+    };
+  }, [loadTasks]);
 
   const saveAndSet = async (updatedTasks: TaskData[]) => {
     setTasks(sortTasks(updatedTasks));
@@ -36,7 +48,7 @@ export default function TaskBoard() {
   // Toggle completion checkbox
   const onToggleTask = async (id: string) => {
     const updatedTasks = tasks.map((task) =>
-      task.id === id ? { ...task, completed: !task.completed } : task
+      task.id === id ? { ...task, completed: !task.completed } : task,
     );
     await saveAndSet(updatedTasks);
   };
@@ -44,7 +56,7 @@ export default function TaskBoard() {
   // Update full task (e.g. description, priority)
   const onUpdateTask = async (updatedTask: TaskData) => {
     const updatedTasks = tasks.map((t) =>
-      t.id === updatedTask.id ? updatedTask : t
+      t.id === updatedTask.id ? updatedTask : t,
     );
     await saveAndSet(updatedTasks);
   };
@@ -88,38 +100,50 @@ export default function TaskBoard() {
 
     // Update tasks list
     const updatedTasks = tasks.map((t) =>
-      t.id === updatedTask.id ? updatedTask : t
+      t.id === updatedTask.id ? updatedTask : t,
     );
 
     await saveAndSet(updatedTasks);
   };
 
-  const sensors = useSensors(useSensor(PointerSensor));
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+      bypassActivationConstraint: ({ event }) => {
+        const target = event.target as HTMLElement | null;
 
-  if (!loaded) return <div>Loading</div>;
+        return Boolean(target?.closest(".drag-handle"));
+      },
+    }),
+  );
+
+  const collisionDetection: CollisionDetection = (args) => {
+    const pointerCollisions = pointerWithin(args);
+
+    if (pointerCollisions.length > 0) {
+      return pointerCollisions;
+    }
+
+    return closestCenter(args);
+  };
+
+  if (!loaded)
+    return <div className="board-loading">Loading your workspace</div>;
 
   // Separate calendar tasks (have a date) and kanban tasks (no date)
-  console.log("Rendering TaskBoard with tasks:", tasks);
   const calendarTasks = tasks.filter((t) => t.date);
   const kanbanTasks = tasks.filter((t) => !t.date);
-  console.log("Calendar tasks:", calendarTasks);
-  console.log("Kanban tasks:", kanbanTasks);
 
   return (
     <DndContext
       onDragEnd={onDragEnd}
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={collisionDetection}
     >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column", // stack vertically instead of row
-          gap: 24,
-          padding: 16,
-          margin: "0 auto",
-        }}
-      >
+      <div className="board-stack">
         <Calendar
           tasks={calendarTasks}
           onUpdateTask={onUpdateTask}

@@ -33,25 +33,29 @@
 .kanban {
   display: flex;
   gap: 16px;
-  background: var(--bg-secondary);
-  padding: 20px;
-  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-elevated) 100%);
+  padding: 18px;
+  border-radius: 24px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
   min-height: 300px;
   overflow-x: auto;
+  backdrop-filter: blur(18px);
 }
 
 .kanban-column {
   flex: 1 1 300px;
-  background: var(--bg-primary);
-  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-elevated) 100%);
+  border-radius: 22px;
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding: 14px;
   max-height: 600px;
   overflow-y: auto;
   transition: all 0.2s ease;
+  backdrop-filter: blur(18px);
 }
 
 .kanban-column:hover {
@@ -118,10 +122,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   padding: 12px 14px;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  border-radius: 8px;
+  background: linear-gradient(135deg, var(--surface-elevated) 0%, var(--surface) 100%);
+  border-radius: 18px;
   border: 1px solid var(--border-color);
   position: relative;
   overflow: hidden;
@@ -146,7 +150,7 @@
 
 .kanban-header:hover {
   border-color: var(--primary-light);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
+  box-shadow: var(--shadow-sm);
   transform: translateY(-1px);
 }
 
@@ -184,7 +188,7 @@
   width: auto;
   white-space: nowrap;
   border-width: 1.5px;
-  background: white;
+  background: var(--surface);
   transition: all 0.2s ease;
 }
 
@@ -229,18 +233,19 @@
   justify-content: center;
   align-items: center;
   gap: 12px;
-  padding: 12px;
-  background: var(--bg-primary);
-  border-radius: var(--radius-md);
+  padding: 14px;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-elevated) 100%);
+  border-radius: 22px;
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(18px);
 }
 
 .nav-btn {
   padding: 8px 16px;
-  border-radius: var(--radius-sm);
+  border-radius: 999px;
   border: 1px solid var(--border-color);
-  background: var(--bg-primary);
+  background: var(--surface);
   color: var(--text-primary);
   font-size: 14px;
   font-weight: 500;
@@ -278,14 +283,15 @@
 .calendar-day {
   flex: 1;
   min-height: 150px;
-  background-color: var(--bg-primary);
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-elevated) 100%);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border-radius: 22px;
   padding: 14px;
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   transition: all 0.2s ease;
+  backdrop-filter: blur(18px);
 }
 
 .calendar-day:hover {
@@ -309,10 +315,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   padding: 12px 14px;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  border-radius: 8px;
+  background: linear-gradient(135deg, var(--surface-elevated) 0%, var(--surface) 100%);
+  border-radius: 18px;
   border: 1px solid var(--border-color);
   position: relative;
   overflow: hidden;
@@ -337,7 +343,7 @@
 
 .calendar-day-header:hover {
   border-color: var(--primary-light);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
+  box-shadow: var(--shadow-sm);
   transform: translateY(-1px);
 }
 
@@ -399,7 +405,7 @@
   width: auto;
   white-space: nowrap;
   border-width: 1.5px;
-  background: white;
+  background: var(--surface);
   transition: all 0.2s ease;
 }
 
@@ -415,7 +421,7 @@
 
 /* Today's header special styling */
 .calendar-day.today .calendar-day-header {
-  background: linear-gradient(135deg, var(--primary-lighter) 0%, #ffffff 100%);
+  background: linear-gradient(135deg, var(--primary-lighter) 0%, var(--surface) 100%);
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px var(--primary-light);
 }
@@ -482,8 +488,8 @@
   align-items: flex-start;
   gap: 10px;
   padding: 14px;
-  background: white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-elevated) 100%);
+  box-shadow: var(--shadow-sm);
 }
 
 .calendar-day-header.card-style .add-task-btn {
@@ -503,8 +509,8 @@
   flex-direction: column;
   gap: 8px;
   min-height: 80px;
-  background-color: var(--bg-secondary);
-  border-radius: var(--radius-sm);
+  background-color: var(--surface-muted);
+  border-radius: 16px;
   padding: 8px;
   overflow-y: auto;
 }
@@ -610,42 +616,42 @@
 
 .task-card {
   animation: slideIn 0.2s ease-out;
+  border-radius: 16px;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-elevated) 100%);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
 }
 
-/* ==================== DARK MODE SUPPORT (Optional) ==================== */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-primary: #1e293b;
-    --bg-secondary: #0f172a;
-    --bg-tertiary: #334155;
-    
-    --border-color: #334155;
-    --border-hover: #475569;
-    
-    --text-primary: #f1f5f9;
-    --text-secondary: #cbd5e1;
-    --text-tertiary: #64748b;
-  }
-  
-  .task-card,
-  .kanban-column,
-  .calendar-day {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-  }
-  
-  .calendar-day-header,
-  .kanban-header {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    border-color: #334155;
-  }
-  
-  .calendar-day.today .calendar-day-header {
-    background: linear-gradient(135deg, #1e3a8a 0%, #1e293b 100%);
-    border-color: #3b82f6;
-  }
-  
-  .calendar-day-header .add-task-btn,
-  .kanban-header .add-task-btn {
-    background: #1e293b;
-  }
+/* ==================== DARK MODE SUPPORT ==================== */
+:root[data-theme="dark"] {
+  --bg-primary: #111827;
+  --bg-secondary: #162031;
+  --bg-tertiary: #1f2937;
+  --border-color: #334155;
+  --border-hover: #475569;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-tertiary: #94a3b8;
+}
+
+:root[data-theme="dark"] .task-card,
+:root[data-theme="dark"] .kanban-column,
+:root[data-theme="dark"] .calendar-day {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+:root[data-theme="dark"] .calendar-day-header,
+:root[data-theme="dark"] .kanban-header {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-color: #334155;
+}
+
+:root[data-theme="dark"] .calendar-day.today .calendar-day-header {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e293b 100%);
+  border-color: #3b82f6;
+}
+
+:root[data-theme="dark"] .calendar-day-header .add-task-btn,
+:root[data-theme="dark"] .kanban-header .add-task-btn {
+  background: rgba(15, 23, 42, 0.9);
 }

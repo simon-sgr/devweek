@@ -1,9 +1,24 @@
 import { TaskData } from "@/components/task/types";
 import { load, Store } from '@tauri-apps/plugin-store';
+import { SettingStore } from "./SettingStore";
 
 export class TaskStore {
   private store?: Store;
   private readonly key = "tasks";
+
+  private getLocalDateKey(value: Date): string {
+    const year = value.getFullYear();
+    const month = String(value.getMonth() + 1).padStart(2, "0");
+    const day = String(value.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  private toDate(value: Date | string | undefined): Date | null {
+    if (!value) return null;
+
+    const parsedDate = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+  }
 
   private async initStore() {
     if (!this.store) {
@@ -57,5 +72,46 @@ export class TaskStore {
   async importTasks(jsonData: string): Promise<void> {
     const tasks: TaskData[] = JSON.parse(jsonData);
     await this.saveTasks(tasks);
+  }
+
+  async moveOverdueOpenTasksToToday(
+    settingStore: SettingStore,
+  ): Promise<boolean> {
+    const enabled = await settingStore.getAutoMoveTasks();
+    if (!enabled) return false;
+
+    const today = new Date();
+    const todayKey = this.getLocalDateKey(today);
+    const lastChecked = await settingStore.getAutoMoveTasksChecked();
+
+    if (lastChecked === todayKey) {
+      return false;
+    }
+
+    const tasks = await this.loadTasks();
+    let changed = false;
+
+    const updatedTasks = tasks.map((task) => {
+      if (task.completed || !task.date) return task;
+
+      const taskDate = this.toDate(task.date);
+      if (!taskDate) return task;
+
+      const taskDateKey = this.getLocalDateKey(taskDate);
+      if (taskDateKey >= todayKey) return task;
+
+      changed = true;
+      return {
+        ...task,
+        date: new Date(today),
+      };
+    });
+
+    if (changed) {
+      await this.saveTasks(updatedTasks);
+    }
+
+    await settingStore.setAutoMoveTasksChecked(todayKey);
+    return changed;
   }
 }

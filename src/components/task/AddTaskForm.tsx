@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { open } from "@tauri-apps/plugin-shell";
@@ -25,6 +26,21 @@ export default function AddTaskForm({
   const [priority, setPriority] = useState(defaultPriority);
   const [isPreview, setIsPreview] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (onCancel) {
+      const handleEscape = (event: KeyboardEvent) => {
+        if (event.key === "Escape") {
+          onCancel();
+        }
+      };
+
+      window.addEventListener("keydown", handleEscape);
+      return () => window.removeEventListener("keydown", handleEscape);
+    }
+
+    return undefined;
+  }, [onCancel]);
 
   const handleLinkClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
@@ -64,9 +80,15 @@ export default function AddTaskForm({
     setError("");
   }
 
-  return (
-    <div className="modal-backdrop" onClick={onCancel}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+  return createPortal(
+    <div className="modal-backdrop" onClick={onCancel} role="presentation">
+      <div
+        className="modal"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Add task"
+      >
         <header className="modal-header">
           <input
             type="text"
@@ -137,6 +159,7 @@ export default function AddTaskForm({
           </button>
         </footer>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

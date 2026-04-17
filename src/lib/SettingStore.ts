@@ -1,5 +1,10 @@
 import { load, Store } from '@tauri-apps/plugin-store';
 
+export type ThemePreference = "light" | "dark" | "system";
+
+const themePreferenceKey = "themePreference";
+const autoMoveTasksCheckedKey = "autoMoveTasksChecked";
+
 export class SettingStore {
     private store?: Store;
 
@@ -40,5 +45,22 @@ export class SettingStore {
     async getAutoMoveTasks(): Promise<boolean> {
         const value = await this.getSetting<boolean>('autoMoveTasks');
         return value ?? false; // default to false if not set
+    }
+
+    async setAutoMoveTasksChecked(value: string): Promise<void> {
+        await this.setSetting<string>(autoMoveTasksCheckedKey, value);
+    }
+
+    async getAutoMoveTasksChecked(): Promise<string | null> {
+        return await this.getSetting<string>(autoMoveTasksCheckedKey);
+    }
+
+    async setThemePreference(value: ThemePreference): Promise<void> {
+        await this.setSetting<ThemePreference>(themePreferenceKey, value);
+    }
+
+    async getThemePreference(): Promise<ThemePreference> {
+        const value = await this.getSetting<ThemePreference>(themePreferenceKey);
+        return value ?? "system";
     }
 }

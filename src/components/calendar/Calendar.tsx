@@ -27,9 +27,6 @@ export default function Calendar({
 }: CalendarProps) {
   const [currentWeek, setCurrentWeek] = useState<Date[]>(getCurrentWorkWeek());
   const todayStr = new Date().toISOString().slice(0, 10);
-
-  console.log("Current week start:", currentWeek);
-  console.log("Week days:", currentWeek);
   const [addingDate, setAddingDate] = useState<Date | null>(null);
 
   const goToNextWeek = () => {

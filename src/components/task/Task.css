@@ -3,17 +3,22 @@
   align-items: center;
   gap: 8px;
 
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
-  background: white;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-elevated) 100%);
+  color: var(--text-primary);
 
   cursor: pointer;
-  transition: background 0.2s;
+  transition: transform 0.2s ease, background 0.2s, border-color 0.2s, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  will-change: transform;
 }
 
 .task:hover {
-  background: #f9fafb;
+  background: linear-gradient(180deg, var(--surface-elevated) 0%, var(--surface) 100%);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .task--completed {
@@ -56,12 +61,13 @@
   margin-right: 8px;
   cursor: grab;
   user-select: none;
+  touch-action: none;
 }
 
 .drag-handle span {
   width: 12px;
   height: 2px;
-  background-color: #666;
+  background-color: var(--text-tertiary);
   border-radius: 2px;
 }
 
@@ -73,4 +79,5 @@ input[type="checkbox"] {
   cursor: pointer;
   z-index: 10;
   position: relative; /* needed for z-index */
+  accent-color: var(--primary-color);
 }
