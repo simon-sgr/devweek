@@ -378,9 +378,13 @@ textarea::placeholder {
   border-radius: 8px;
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 13px;
-  color: #f87171;
+  color: #b91c1c;
   font-weight: 600;
   border: 1px solid var(--border-color, #e2e8f0);
+}
+
+:root[data-theme="dark"] .description-preview code {
+  color: #fca5a5;
 }
 
 .description-preview pre {
@@ -401,7 +405,6 @@ textarea::placeholder {
 
 .description-preview blockquote {
   border-left: 4px solid var(--primary-color, #3b82f6);
-  padding-left: 16px;
   margin: 12px 0;
   color: var(--text-secondary, #64748b);
   font-style: italic;
