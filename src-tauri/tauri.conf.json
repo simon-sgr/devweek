@@ -1,7 +1,6 @@
 {
-  "$schema": "https://schema.tauri.app/config/2",
   "productName": "devweek",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "identifier": "at.simon.devweek",
   "build": {
     "beforeDevCommand": "npm run dev",

@@ -5,24 +5,28 @@ import remarkGfm from "remark-gfm";
 import { open } from "@tauri-apps/plugin-shell";
 import "../../styles/TaskInfo.css";
 import { TaskData, Priority } from "./types";
+import PrioritySelect from "./PrioritySelect";
 
 type Props = {
   task: TaskData;
   onClose: () => void;
   onSave: (task: TaskData) => void;
+  onDelete: (id: string) => void;
 };
 
-export default function TaskModal({ task, onClose, onSave }: Props) {
+export default function TaskModal({ task, onClose, onSave, onDelete }: Props) {
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description ?? "");
   const [priority, setPriority] = useState<Priority>(task.priority);
   const [isPreview, setIsPreview] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     setTitle(task.title);
     setDescription(task.description ?? "");
     setPriority(task.priority);
     setIsPreview(false);
+    setShowDeleteConfirm(false);
   }, [task]);
 
   useEffect(() => {
@@ -57,6 +61,11 @@ export default function TaskModal({ task, onClose, onSave }: Props) {
     onClose();
   };
 
+  const handleDelete = () => {
+    onDelete(task.id);
+    onClose();
+  };
+
   return createPortal(
     <div className="modal-backdrop" onClick={handleSave} role="presentation">
       <div
@@ -79,15 +88,7 @@ export default function TaskModal({ task, onClose, onSave }: Props) {
         <div className="modal-body">
           <label>
             <span className="label">Priority</span>
-            <select
-              value={priority}
-              onChange={(e) => setPriority(e.target.value as Priority)}
-              className={`priority-select ${priority}`}
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
+            <PrioritySelect value={priority} onChange={setPriority} />
           </label>
 
           <label>
@@ -122,6 +123,12 @@ export default function TaskModal({ task, onClose, onSave }: Props) {
         </div>
 
         <footer className="modal-actions">
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="btn danger"
+          >
+            Delete
+          </button>
           <button onClick={onClose} className="btn">
             Cancel
           </button>
@@ -129,6 +136,37 @@ export default function TaskModal({ task, onClose, onSave }: Props) {
             Save
           </button>
         </footer>
+
+        {showDeleteConfirm && (
+          <div
+            className="delete-confirm-overlay"
+            role="alertdialog"
+            aria-modal="true"
+          >
+            <div className="delete-confirm-card">
+              <h3>Delete Task?</h3>
+              <p>
+                This task will be removed permanently and cannot be restored.
+              </p>
+              <div className="delete-confirm-actions">
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => setShowDeleteConfirm(false)}
+                >
+                  Keep Task
+                </button>
+                <button
+                  type="button"
+                  className="btn danger"
+                  onClick={handleDelete}
+                >
+                  Yes, Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>,
     document.body,

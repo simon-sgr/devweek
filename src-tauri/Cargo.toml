@@ -1,6 +1,6 @@
 [package]
 name = "devweek"
-version = "0.1.0"
+version = "0.1.1"
 description = "A work week planer"
 authors = ["Simon Schoeggler"]
 edition = "2021"

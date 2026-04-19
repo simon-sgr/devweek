@@ -203,21 +203,15 @@
 }
 
 /* Different colors for different status columns */
-.kanban-column[data-status="todo"] .kanban-header strong::before {
+.kanban-column[data-status="inbox"] .kanban-header strong::before {
   background: #6366f1; /* Indigo */
 }
 
-.kanban-column[data-status="in-progress"] .kanban-header strong::before,
-.kanban-column[data-status="in_progress"] .kanban-header strong::before {
+.kanban-column[data-status="ready"] .kanban-header strong::before {
   background: #f59e0b; /* Amber */
 }
 
-.kanban-column[data-status="done"] .kanban-header strong::before,
-.kanban-column[data-status="completed"] .kanban-header strong::before {
-  background: #10b981; /* Green */
-}
-
-.kanban-column[data-status="blocked"] .kanban-header strong::before {
+.kanban-column[data-status="on-hold"] .kanban-header strong::before {
   background: #ef4444; /* Red */
 }
 

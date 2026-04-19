@@ -17,6 +17,7 @@ interface CalendarProps {
   onAddTask: (task: TaskData) => void;
   onUpdateTask: (task: TaskData) => void;
   onToggle: (id: string) => void;
+  onDeleteTask: (id: string) => void;
 }
 
 export default function Calendar({
@@ -24,6 +25,7 @@ export default function Calendar({
   onAddTask,
   onUpdateTask,
   onToggle,
+  onDeleteTask,
 }: CalendarProps) {
   const [currentWeek, setCurrentWeek] = useState<Date[]>(getCurrentWorkWeek());
   const todayStr = new Date().toISOString().slice(0, 10);
@@ -99,6 +101,7 @@ export default function Calendar({
                       task={task}
                       onToggle={onToggle}
                       onUpdate={onUpdateTask}
+                      onDelete={onDeleteTask}
                     />
                   ))}
                 </div>
@@ -151,10 +154,12 @@ function DraggableTask({
   task,
   onUpdate,
   onToggle,
+  onDelete,
 }: {
   task: TaskData;
   onUpdate: (task: TaskData) => void;
   onToggle: (id: string) => void;
+  onDelete: (id: string) => void;
 }) {
   const { setNodeRef, attributes, listeners, transform, isDragging } =
     useDraggable({ id: task.id });
@@ -172,6 +177,7 @@ function DraggableTask({
         task={task}
         onUpdate={onUpdate}
         onToggle={onToggle}
+        onDelete={onDelete}
         dragHandleProps={{ ...listeners, ...attributes }}
       />
     </div>

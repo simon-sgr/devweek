@@ -10,6 +10,7 @@ interface KanbanProps {
   tasks: TaskData[];
   onUpdateTask: (task: TaskData) => void;
   onToggle: (id: string) => void;
+  onDeleteTask: (id: string) => void;
   onAddTask: (task: TaskData) => void;
 }
 
@@ -23,6 +24,7 @@ export default function Kanban({
   tasks,
   onUpdateTask,
   onToggle,
+  onDeleteTask,
   onAddTask,
 }: KanbanProps) {
   // Group tasks by status
@@ -48,6 +50,7 @@ export default function Kanban({
           tasks={tasksByStatus[id]}
           onUpdateTask={onUpdateTask}
           onToggle={onToggle}
+          onDeleteTask={onDeleteTask}
           onAddTask={onAddTask}
         />
       ))}
@@ -61,6 +64,7 @@ interface KanbanColumnProps {
   tasks: TaskData[];
   onUpdateTask: (task: TaskData) => void;
   onToggle: (id: string) => void;
+  onDeleteTask: (id: string) => void;
   onAddTask: (task: TaskData) => void;
 }
 
@@ -70,9 +74,11 @@ function KanbanColumn({
   tasks,
   onUpdateTask,
   onToggle,
+  onDeleteTask,
   onAddTask,
 }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id });
+  const statusId = id.replace("status:", "");
 
   const [addingStatusTask, setAddingStatusTask] = useState<string | null>(null);
 
@@ -81,12 +87,13 @@ function KanbanColumn({
       <div
         ref={setNodeRef}
         className={`kanban-column ${isOver ? "drag-over" : ""}`}
+        data-status={statusId}
       >
         <div className="kanban-header">
           <strong>{label}</strong>
           <button
             className="add-task-btn"
-            onClick={() => setAddingStatusTask(id.replace("status:", ""))}
+            onClick={() => setAddingStatusTask(statusId)}
             type="button"
           >
             <Plus size={16} /> Add Task
@@ -100,6 +107,7 @@ function KanbanColumn({
               task={task}
               onUpdate={onUpdateTask}
               onToggle={onToggle}
+              onDelete={onDeleteTask}
             />
           ))}
         </div>
@@ -121,15 +129,16 @@ function KanbanColumn({
 interface TaskDraggableProps {
   task: TaskData;
   onUpdate: (task: TaskData) => void;
+  onToggle: (id: string) => void;
+  onDelete: (id: string) => void;
 }
 
-interface TaskDraggableProps {
-  task: TaskData;
-  onUpdate: (task: TaskData) => void;
-  onToggle: (id: string) => void; // <-- add this
-}
-
-function TaskDraggable({ task, onUpdate, onToggle }: TaskDraggableProps) {
+function TaskDraggable({
+  task,
+  onUpdate,
+  onToggle,
+  onDelete,
+}: TaskDraggableProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: task.id,
@@ -149,6 +158,7 @@ function TaskDraggable({ task, onUpdate, onToggle }: TaskDraggableProps) {
         task={task}
         onUpdate={onUpdate}
         onToggle={onToggle}
+        onDelete={onDelete}
         dragHandleProps={{ ...listeners, ...attributes }}
       />
     </div>

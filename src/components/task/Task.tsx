@@ -8,10 +8,17 @@ interface TaskProps {
   task: TaskData;
   onToggle: (id: string) => void;
   onUpdate: (task: TaskData) => void;
+  onDelete: (id: string) => void;
   dragHandleProps?: React.HTMLAttributes<HTMLDivElement>;
 }
 
-const Task = ({ task, onToggle, onUpdate, dragHandleProps }: TaskProps) => {
+const Task = ({
+  task,
+  onToggle,
+  onUpdate,
+  onDelete,
+  dragHandleProps,
+}: TaskProps) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -50,6 +57,7 @@ const Task = ({ task, onToggle, onUpdate, dragHandleProps }: TaskProps) => {
           task={task}
           onClose={() => setOpen(false)}
           onSave={onUpdate}
+          onDelete={onDelete}
         />
       )}
     </>

@@ -6,6 +6,8 @@ import {
   TrendingUp,
   Inbox,
   PauseCircle,
+  PieChart as PieChartIcon,
+  BarChart3,
 } from "lucide-react";
 import {
   PieChart,
@@ -26,6 +28,35 @@ import { TaskData } from "./components/task/types";
 const taskStore = new TaskStore();
 
 type TimePeriod = "week" | "month" | "year" | "all";
+
+function startOfDay(value: Date): Date {
+  const result = new Date(value);
+  result.setHours(0, 0, 0, 0);
+  return result;
+}
+
+function endOfDay(value: Date): Date {
+  const result = new Date(value);
+  result.setHours(23, 59, 59, 999);
+  return result;
+}
+
+function parseTaskDate(value: Date | string | undefined): Date | null {
+  if (!value) return null;
+
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : new Date(value);
+  }
+
+  const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (dateOnlyMatch) {
+    const [, year, month, day] = dateOnlyMatch;
+    return new Date(Number(year), Number(month) - 1, Number(day));
+  }
+
+  const parsedDate = new Date(value);
+  return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+}
 
 export default function Statistic() {
   const [tasks, setTasks] = useState<TaskData[]>([]);
@@ -49,34 +80,6 @@ export default function Statistic() {
     setTasks(loadedTasks);
   };
 
-  // Filter tasks based on selected time period
-  const getFilteredTasks = () => {
-    if (timePeriod === "all") return tasks;
-
-    const now = new Date();
-    const startDate = new Date();
-
-    switch (timePeriod) {
-      case "week":
-        startDate.setDate(now.getDate() - 7);
-        break;
-      case "month":
-        startDate.setMonth(now.getMonth() - 1);
-        break;
-      case "year":
-        startDate.setFullYear(now.getFullYear() - 1);
-        break;
-    }
-
-    return tasks.filter((task) => {
-      if (!task.date) return false;
-      const taskDate = new Date(task.date);
-      return taskDate >= startDate && taskDate <= now;
-    });
-  };
-
-  const filteredTasks = getFilteredTasks();
-
   const now = new Date();
   const periodLabelMap: Record<TimePeriod, string> = {
     week: "This week",
@@ -91,7 +94,8 @@ export default function Statistic() {
       day: "numeric",
     });
 
-  const getPeriodStartDate = () => {
+  function getPeriodBounds() {
+    const endDate = endOfDay(now);
     const startDate = new Date(now);
 
     switch (timePeriod) {
@@ -99,23 +103,41 @@ export default function Statistic() {
         startDate.setDate(now.getDate() - 6);
         break;
       case "month":
-        startDate.setMonth(now.getMonth() - 1);
+        startDate.setDate(1);
         break;
       case "year":
-        startDate.setFullYear(now.getFullYear() - 1);
+        startDate.setMonth(0, 1);
         break;
       case "all":
         return null;
     }
 
-    startDate.setHours(0, 0, 0, 0);
-    return startDate;
+    return {
+      startDate: startOfDay(startDate),
+      endDate,
+    };
+  }
+
+  // Filter tasks based on selected time period
+  const getFilteredTasks = () => {
+    if (timePeriod === "all") return tasks;
+
+    const bounds = getPeriodBounds();
+    if (!bounds) return tasks;
+
+    return tasks.filter((task) => {
+      const taskDate = parseTaskDate(task.date);
+      if (!taskDate) return false;
+      return taskDate >= bounds.startDate && taskDate <= bounds.endDate;
+    });
   };
 
-  const periodStartDate = getPeriodStartDate();
+  const filteredTasks = getFilteredTasks();
+
+  const periodBounds = getPeriodBounds();
   const periodDateRange =
-    periodStartDate !== null
-      ? `${formatShortDate(periodStartDate)} - ${formatShortDate(now)}`
+    periodBounds !== null
+      ? `${formatShortDate(periodBounds.startDate)} - ${formatShortDate(periodBounds.endDate)}`
       : `All tasks in your workspace`;
 
   // Calculate statistics
@@ -135,16 +157,16 @@ export default function Statistic() {
       ? `${completedTasks} completed, ${pendingTasks} still open`
       : "No tasks in this period yet";
 
+  const workflowSummary = [
+    { name: "Inbox", value: inboxTasks, Icon: Inbox },
+    { name: "Ready", value: readyTasks, Icon: CheckCircle },
+    { name: "On Hold", value: onHoldTasks, Icon: PauseCircle },
+  ];
+
   // Task status data for pie chart
   const statusData = [
     { name: "Completed", value: completedTasks, color: "#10b981" },
     { name: "Pending", value: pendingTasks, color: "#f59e0b" },
-  ];
-
-  const workflowStatusData = [
-    { name: "Inbox", value: inboxTasks, color: "#60a5fa" },
-    { name: "Ready", value: readyTasks, color: "#10b981" },
-    { name: "On Hold", value: onHoldTasks, color: "#f59e0b" },
   ];
 
   // Tasks by day of week
@@ -157,8 +179,8 @@ export default function Statistic() {
   ];
   const tasksByDay = weekdaySeries.map(({ label, index }) => {
     const count = filteredTasks.filter((task) => {
-      if (!task.date) return false;
-      const taskDate = new Date(task.date);
+      const taskDate = parseTaskDate(task.date);
+      if (!taskDate) return false;
       return taskDate.getDay() === index;
     }).length;
     return { day: label, count };
@@ -182,6 +204,7 @@ export default function Statistic() {
       color: "#10b981",
     },
   ];
+  const visiblePriorityData = priorityData.filter((p) => p.value > 0);
 
   return (
     <div className="statistics-container">
@@ -189,7 +212,7 @@ export default function Statistic() {
         <div className="stats-header__title">
           <h2>Statistics</h2>
           <p>
-            {periodLabelMap[timePeriod]} · {periodDateRange}
+            {periodLabelMap[timePeriod]}: {periodDateRange}
           </p>
         </div>
 
@@ -222,105 +245,76 @@ export default function Statistic() {
         </div>
       </div>
 
-      <div className="stats-highlights">
-        <div className="highlight-card highlight-card--primary">
-          <span className="highlight-card__label">Current period</span>
+      <div className="stats-summary">
+        <div className="summary-card summary-card--primary">
+          <div className="summary-card__top">
+            <span className="summary-card__icon summary-card__icon--primary">
+              <Clock size={16} />
+            </span>
+            <span className="summary-card__label">Current period</span>
+          </div>
           <strong>{periodLabelMap[timePeriod]}</strong>
           <span>{periodDateRange}</span>
         </div>
 
-        <div className="highlight-card">
-          <span className="highlight-card__label">Open tasks</span>
-          <strong>{openTasks}</strong>
+        <div className="summary-card">
+          <div className="summary-card__top">
+            <span className="summary-card__icon">
+              <CheckCircle size={16} />
+            </span>
+            <span className="summary-card__label">Tasks</span>
+          </div>
+          <strong>{totalTasks}</strong>
           <span>{completedTrend}</span>
         </div>
 
-        <div className="highlight-card">
-          <span className="highlight-card__label">Completion rate</span>
+        <div className="summary-card">
+          <div className="summary-card__top">
+            <span className="summary-card__icon">
+              <TrendingUp size={16} />
+            </span>
+            <span className="summary-card__label">Completion</span>
+          </div>
           <strong>{completionRate}%</strong>
-          <span>Of tasks in the selected period</span>
+          <span>Finished in the selected period</span>
+        </div>
+
+        <div className="summary-card summary-card--compact">
+          <div className="summary-card__top">
+            <span className="summary-card__icon">
+              <Circle size={16} />
+            </span>
+            <span className="summary-card__label">Open</span>
+          </div>
+          <strong>{openTasks}</strong>
+          <span>Still active</span>
         </div>
       </div>
 
-      {/* Overview Cards */}
-      <div className="stats-cards">
-        <div className="stat-card">
-          <div className="stat-icon total">
-            <Clock size={24} />
+      <div className="workflow-strip" aria-label="Workflow breakdown">
+        {workflowSummary.map((entry) => (
+          <div className="workflow-chip" key={entry.name}>
+            <div className="workflow-chip__label-wrap">
+              <span className="workflow-chip__icon">
+                <entry.Icon size={14} />
+              </span>
+              <span className="workflow-chip__label">{entry.name}</span>
+            </div>
+            <strong>{entry.value}</strong>
           </div>
-          <div className="stat-info">
-            <h3>Total Tasks</h3>
-            <p className="stat-number">{totalTasks}</p>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon completed">
-            <CheckCircle size={24} />
-          </div>
-          <div className="stat-info">
-            <h3>Completed</h3>
-            <p className="stat-number">{completedTasks}</p>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon pending">
-            <Circle size={24} />
-          </div>
-          <div className="stat-info">
-            <h3>Pending</h3>
-            <p className="stat-number">{pendingTasks}</p>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon rate">
-            <TrendingUp size={24} />
-          </div>
-          <div className="stat-info">
-            <h3>Completion Rate</h3>
-            <p className="stat-number">{completionRate}%</p>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon inbox">
-            <Inbox size={24} />
-          </div>
-          <div className="stat-info">
-            <h3>Inbox</h3>
-            <p className="stat-number">{inboxTasks}</p>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon ready">
-            <CheckCircle size={24} />
-          </div>
-          <div className="stat-info">
-            <h3>Ready</h3>
-            <p className="stat-number">{readyTasks}</p>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon hold">
-            <PauseCircle size={24} />
-          </div>
-          <div className="stat-info">
-            <h3>On Hold</h3>
-            <p className="stat-number">{onHoldTasks}</p>
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* Charts Grid */}
       <div className="charts-grid">
-        {/* Completion Rate Pie Chart */}
-        <div className="chart-card">
+        <div className="chart-card chart-card--half">
           <div className="chart-card__header">
-            <h3>Task Status Distribution</h3>
+            <div className="chart-card__title-row">
+              <span className="chart-card__icon chart-card__icon--blue">
+                <PieChartIcon size={16} />
+              </span>
+              <h3>Task Status Distribution</h3>
+            </div>
             <p>Completed versus open tasks in the selected period.</p>
           </div>
           {totalTasks > 0 ? (
@@ -361,37 +355,21 @@ export default function Statistic() {
           )}
         </div>
 
-        {/* Tasks by Day Bar Chart */}
-        <div className="chart-card">
+        <div className="chart-card chart-card--half">
           <div className="chart-card__header">
-            <h3>Tasks by Day of Week</h3>
-            <p>Where work is concentrated across the workweek.</p>
-          </div>
-          {totalTasks > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={tasksByDay}>
-                <XAxis dataKey="day" tick={{ fontSize: 12 }} />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="count" fill="#3b82f6" />
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <p className="no-data">No tasks found for this time period</p>
-          )}
-        </div>
-
-        {/* Priority Distribution Pie Chart */}
-        <div className="chart-card">
-          <div className="chart-card__header">
-            <h3>Priority Distribution</h3>
+            <div className="chart-card__title-row">
+              <span className="chart-card__icon chart-card__icon--amber">
+                <BarChart3 size={16} />
+              </span>
+              <h3>Priority Distribution</h3>
+            </div>
             <p>How much of the workload is urgent versus flexible.</p>
           </div>
           {totalTasks > 0 ? (
             <ResponsiveContainer width="100%" height={340}>
               <PieChart margin={{ top: 8, right: 16, bottom: 24, left: 16 }}>
                 <Pie
-                  data={priorityData.filter((p) => p.value > 0)}
+                  data={visiblePriorityData}
                   cx="50%"
                   cy="46%"
                   labelLine={false}
@@ -400,7 +378,7 @@ export default function Statistic() {
                   fill="#8884d8"
                   dataKey="value"
                 >
-                  {priorityData.map((entry, index) => (
+                  {visiblePriorityData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
@@ -427,24 +405,23 @@ export default function Statistic() {
 
         <div className="chart-card chart-card--wide">
           <div className="chart-card__header">
-            <h3>Workflow Status</h3>
-            <p>Inbox, ready, and on hold counts for the selected period.</p>
+            <div className="chart-card__title-row">
+              <span className="chart-card__icon chart-card__icon--green">
+                <BarChart3 size={16} />
+              </span>
+              <h3>Tasks by Day of Week</h3>
+            </div>
+            <p>Where work is concentrated across the workweek.</p>
           </div>
           {totalTasks > 0 ? (
-            <div className="workflow-status-grid">
-              {workflowStatusData.map((entry) => (
-                <div className="workflow-status-item" key={entry.name}>
-                  <span
-                    className="workflow-status-item__dot"
-                    style={{ background: entry.color }}
-                  />
-                  <div>
-                    <strong>{entry.name}</strong>
-                    <span>{entry.value} tasks</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={tasksByDay}>
+                <XAxis dataKey="day" tick={{ fontSize: 12 }} />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill="#3b82f6" />
+              </BarChart>
+            </ResponsiveContainer>
           ) : (
             <p className="no-data">No tasks found for this time period</p>
           )}

@@ -3,7 +3,8 @@ import { createPortal } from "react-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { open } from "@tauri-apps/plugin-shell";
-import type { TaskData, TaskStatus } from "./types";
+import type { Priority, TaskData, TaskStatus } from "./types";
+import PrioritySelect from "./PrioritySelect";
 import "../../styles/TaskInfo.css";
 
 interface AddTaskFormProps {
@@ -13,7 +14,7 @@ interface AddTaskFormProps {
   status?: TaskStatus;
 }
 
-const defaultPriority = "low";
+const defaultPriority: Priority = "low";
 
 export default function AddTaskForm({
   onAddTask,
@@ -23,7 +24,7 @@ export default function AddTaskForm({
 }: AddTaskFormProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState(defaultPriority);
+  const [priority, setPriority] = useState<Priority>(defaultPriority);
   const [isPreview, setIsPreview] = useState(false);
   const [error, setError] = useState("");
 
@@ -66,7 +67,7 @@ export default function AddTaskForm({
       title: title.trim(),
       description: description.trim() || undefined,
       completed: false,
-      priority: priority as TaskData["priority"],
+      priority,
       date: date,
       status: status,
     };
@@ -106,15 +107,7 @@ export default function AddTaskForm({
         <div className="modal-body">
           <label>
             <span className="label">Priority</span>
-            <select
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}
-              className={`priority-select ${priority}`}
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
+            <PrioritySelect value={priority} onChange={setPriority} />
           </label>
 
           <label>

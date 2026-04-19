@@ -61,6 +61,11 @@ export default function TaskBoard() {
     await saveAndSet(updatedTasks);
   };
 
+  const onDeleteTask = async (id: string) => {
+    const updatedTasks = tasks.filter((task) => task.id !== id);
+    await saveAndSet(updatedTasks);
+  };
+
   const addTask = async (task: TaskData) => {
     const updated = sortTasks([...tasks, task]);
     setTasks(updated);
@@ -148,6 +153,7 @@ export default function TaskBoard() {
           tasks={calendarTasks}
           onUpdateTask={onUpdateTask}
           onToggle={onToggleTask}
+          onDeleteTask={onDeleteTask}
           onAddTask={addTask}
         />
 
@@ -155,6 +161,7 @@ export default function TaskBoard() {
           tasks={kanbanTasks}
           onUpdateTask={onUpdateTask}
           onToggle={onToggleTask}
+          onDeleteTask={onDeleteTask}
           onAddTask={addTask}
         />
       </div>
