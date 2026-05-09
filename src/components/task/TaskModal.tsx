@@ -6,6 +6,7 @@ import { open } from "@tauri-apps/plugin-shell";
 import "../../styles/TaskInfo.css";
 import { TaskData, Priority } from "./types";
 import PrioritySelect from "./PrioritySelect";
+import { isSafeExternalLink } from "@/utils/linkUtils";
 
 type Props = {
   task: TaskData;
@@ -45,7 +46,7 @@ export default function TaskModal({ task, onClose, onSave, onDelete }: Props) {
     if (target.tagName === "A") {
       e.preventDefault();
       const href = target.getAttribute("href");
-      if (href) {
+      if (href && isSafeExternalLink(href)) {
         open(href);
       }
     }

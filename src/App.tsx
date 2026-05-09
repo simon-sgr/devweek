@@ -8,9 +8,11 @@ import {
   Minus,
   X,
   CheckSquare2,
+  Wrench,
 } from "lucide-react";
 import TaskBoard from "./TaskBoard";
 import Setting from "./Setting";
+import DevTools from "./DevTools";
 import "./App.css";
 import Statistic from "./Statistic";
 import logo from "./assets/devweek_txt_logo.svg";
@@ -161,6 +163,7 @@ function App() {
   const menuItems = [
     { id: "board", icon: LayoutDashboard, label: "Board" },
     { id: "statistics", icon: BarChart3, label: "Statistics" },
+    { id: "devtools", icon: Wrench, label: "DevTools" },
     { id: "settings", icon: Settings, label: "Settings" },
   ];
 
@@ -174,6 +177,10 @@ function App() {
       title: "Progress Insights",
       subtitle:
         "Track completion trends, priorities, and performance over time.",
+    },
+    devtools: {
+      title: "Developer Tools",
+      subtitle: "Text comparison, cleanup, and other utility tools.",
     },
     settings: {
       title: "Workspace Settings",
@@ -287,6 +294,8 @@ function App() {
                   onThemeChange={handleThemeChange}
                 />
               )}
+
+              {activeView === "devtools" && <DevTools />}
             </div>
           </section>
         </div>

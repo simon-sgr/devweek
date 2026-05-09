@@ -6,6 +6,7 @@ import { open } from "@tauri-apps/plugin-shell";
 import type { Priority, TaskData, TaskStatus } from "./types";
 import PrioritySelect from "./PrioritySelect";
 import "../../styles/TaskInfo.css";
+import { isSafeExternalLink } from "@/utils/linkUtils";
 
 interface AddTaskFormProps {
   onAddTask: (task: TaskData) => void;
@@ -48,7 +49,7 @@ export default function AddTaskForm({
     if (target.tagName === "A") {
       e.preventDefault();
       const href = target.getAttribute("href");
-      if (href) {
+      if (href && isSafeExternalLink(href)) {
         open(href);
       }
     }

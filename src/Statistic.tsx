@@ -24,6 +24,7 @@ import {
 import { TaskStore } from "./lib/TaskStore";
 import "./Statistic.css";
 import { TaskData } from "./components/task/types";
+import { parseTaskDate } from "./utils/dateUtils";
 
 const taskStore = new TaskStore();
 
@@ -39,23 +40,6 @@ function endOfDay(value: Date): Date {
   const result = new Date(value);
   result.setHours(23, 59, 59, 999);
   return result;
-}
-
-function parseTaskDate(value: Date | string | undefined): Date | null {
-  if (!value) return null;
-
-  if (value instanceof Date) {
-    return Number.isNaN(value.getTime()) ? null : new Date(value);
-  }
-
-  const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-  if (dateOnlyMatch) {
-    const [, year, month, day] = dateOnlyMatch;
-    return new Date(Number(year), Number(month) - 1, Number(day));
-  }
-
-  const parsedDate = new Date(value);
-  return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
 }
 
 export default function Statistic() {
@@ -176,6 +160,8 @@ export default function Statistic() {
     { label: "Wed", index: 3 },
     { label: "Thu", index: 4 },
     { label: "Fri", index: 5 },
+    { label: "Sat", index: 6 },
+    { label: "Sun", index: 0 },
   ];
   const tasksByDay = weekdaySeries.map(({ label, index }) => {
     const count = filteredTasks.filter((task) => {

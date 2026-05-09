@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   type CollisionDetection,
+  KeyboardSensor,
   closestCenter,
   DndContext,
   DragEndEvent,
@@ -9,6 +10,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { TaskStore } from "./lib/TaskStore";
 import { TaskData, TaskStatus } from "./components/task/types";
 import { sortTasks } from "./utils/taskUtils";
@@ -47,9 +49,27 @@ export default function TaskBoard() {
 
   // Toggle completion checkbox
   const onToggleTask = async (id: string) => {
-    const updatedTasks = tasks.map((task) =>
-      task.id === id ? { ...task, completed: !task.completed } : task,
-    );
+    const updatedTasks = tasks.map((task) => {
+      if (task.id !== id) return task;
+
+      const isToggleToComplete = !task.completed;
+
+      // If completing a kanban task (has status, no date), move to today
+      if (isToggleToComplete && task.status && !task.date) {
+        return {
+          ...task,
+          completed: true,
+          date: new Date(),
+          status: undefined,
+        };
+      }
+
+      // Otherwise just toggle completion
+      return {
+        ...task,
+        completed: !task.completed,
+      };
+    });
     await saveAndSet(updatedTasks);
   };
 
@@ -123,7 +143,25 @@ export default function TaskBoard() {
         return Boolean(target?.closest(".drag-handle"));
       },
     }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   );
+
+  const [calendarTasks, kanbanTasks] = useMemo(() => {
+    const calendar: TaskData[] = [];
+    const kanban: TaskData[] = [];
+
+    for (const task of tasks) {
+      if (task.date) {
+        calendar.push(task);
+      } else {
+        kanban.push(task);
+      }
+    }
+
+    return [calendar, kanban];
+  }, [tasks]);
 
   const collisionDetection: CollisionDetection = (args) => {
     const pointerCollisions = pointerWithin(args);
@@ -135,36 +173,35 @@ export default function TaskBoard() {
     return closestCenter(args);
   };
 
-  if (!loaded)
-    return <div className="board-loading">Loading your workspace</div>;
-
-  // Separate calendar tasks (have a date) and kanban tasks (no date)
-  const calendarTasks = tasks.filter((t) => t.date);
-  const kanbanTasks = tasks.filter((t) => !t.date);
-
   return (
-    <DndContext
-      onDragEnd={onDragEnd}
-      sensors={sensors}
-      collisionDetection={collisionDetection}
-    >
-      <div className="board-stack">
-        <Calendar
-          tasks={calendarTasks}
-          onUpdateTask={onUpdateTask}
-          onToggle={onToggleTask}
-          onDeleteTask={onDeleteTask}
-          onAddTask={addTask}
-        />
+    <>
+      {!loaded ? (
+        <div className="board-loading">Loading your workspace</div>
+      ) : (
+        <DndContext
+          onDragEnd={onDragEnd}
+          sensors={sensors}
+          collisionDetection={collisionDetection}
+        >
+          <div className="board-stack">
+            <Calendar
+              tasks={calendarTasks}
+              onUpdateTask={onUpdateTask}
+              onToggle={onToggleTask}
+              onDeleteTask={onDeleteTask}
+              onAddTask={addTask}
+            />
 
-        <Kanban
-          tasks={kanbanTasks}
-          onUpdateTask={onUpdateTask}
-          onToggle={onToggleTask}
-          onDeleteTask={onDeleteTask}
-          onAddTask={addTask}
-        />
-      </div>
-    </DndContext>
+            <Kanban
+              tasks={kanbanTasks}
+              onUpdateTask={onUpdateTask}
+              onToggle={onToggleTask}
+              onDeleteTask={onDeleteTask}
+              onAddTask={addTask}
+            />
+          </div>
+        </DndContext>
+      )}
+    </>
   );
 }

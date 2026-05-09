@@ -29,6 +29,14 @@ const Task = ({
         }`}
         {...dragHandleProps}
         onClick={() => setOpen(true)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            setOpen(true);
+          }
+        }}
+        role="button"
+        tabIndex={0}
       >
         <div
           className="drag-handle"
@@ -43,10 +51,9 @@ const Task = ({
         <input
           type="checkbox"
           checked={task.completed}
-          readOnly
+          onChange={() => onToggle(task.id)}
           onClick={(e) => {
             e.stopPropagation();
-            onToggle(task.id);
           }}
         />
         <span className="task__title">{task.title}</span>

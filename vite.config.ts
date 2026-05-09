@@ -8,6 +8,12 @@ const host = process.env.TAURI_DEV_HOST;
 export default defineConfig(async () => ({
   plugins: [react()],
 
+  test: {
+    environment: "jsdom",
+    setupFiles: "./src/setupTests.ts",
+    globals: true,
+  },
+
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),

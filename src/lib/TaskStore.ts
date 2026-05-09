@@ -1,16 +1,21 @@
 import { TaskData } from "@/components/task/types";
 import { load, Store } from '@tauri-apps/plugin-store';
 import { SettingStore } from "./SettingStore";
+import {
+  parseImportJson,
+  parseStoredTasks,
+  toExportDocument,
+  toTaskData,
+  toTaskWire,
+} from "./taskSchema";
+import { toDateOnlyKey } from "@/utils/dateUtils";
 
 export class TaskStore {
   private store?: Store;
   private readonly key = "tasks";
 
   private getLocalDateKey(value: Date): string {
-    const year = value.getFullYear();
-    const month = String(value.getMonth() + 1).padStart(2, "0");
-    const day = String(value.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+    return toDateOnlyKey(value) ?? "";
   }
 
   private toDate(value: Date | string | undefined): Date | null {
@@ -32,13 +37,20 @@ export class TaskStore {
 
   async loadTasks(): Promise<TaskData[]> {
     const store = await this.initStore();
-    const tasks = await store.get<TaskData[]>(this.key);
-    return tasks ?? [];
+    const rawTasks = await store.get<unknown>(this.key);
+
+    try {
+      const parsedTasks = parseStoredTasks(rawTasks);
+      return parsedTasks.map(toTaskData);
+    } catch (error) {
+      console.error("Failed to parse stored tasks", error);
+      return [];
+    }
   }
 
   async saveTasks(tasks: TaskData[]): Promise<void> {
     const store = await this.initStore();
-    await store.set(this.key, tasks);
+    await store.set(this.key, tasks.map(toTaskWire));
     await store.save();
   }
 
@@ -67,11 +79,11 @@ export class TaskStore {
 
   async exportTasks(): Promise<string> {
     const tasks = await this.loadTasks();
-    return JSON.stringify(tasks, null, 2);
+    return JSON.stringify(toExportDocument(tasks), null, 2);
   }
   async importTasks(jsonData: string): Promise<void> {
-    const tasks: TaskData[] = JSON.parse(jsonData);
-    await this.saveTasks(tasks);
+    const parsedTasks = parseImportJson(jsonData);
+    await this.saveTasks(parsedTasks.map(toTaskData));
   }
 
   async moveOverdueOpenTasksToToday(
@@ -92,6 +104,7 @@ export class TaskStore {
     let changed = false;
 
     const updatedTasks = tasks.map((task) => {
+      // Only move calendar tasks: overdue open tasks to today
       if (task.completed || !task.date) return task;
 
       const taskDate = this.toDate(task.date);

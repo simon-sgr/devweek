@@ -27,18 +27,21 @@ export default function Kanban({
   onDeleteTask,
   onAddTask,
 }: KanbanProps) {
-  // Group tasks by status
   const tasksByStatus = columns.reduce<Record<string, TaskData[]>>(
     (acc, col) => {
-      acc[col.id] = tasks.filter((task) => {
-        // For kanban tasks, date must be undefined, status must match column id (after removing prefix)
-        if (task.date) return false;
-        return task.status === col.id.replace("status:", "");
-      });
+      acc[col.id] = [];
       return acc;
     },
     {},
   );
+
+  for (const task of tasks) {
+    if (task.date || !task.status) continue;
+    const key = `status:${task.status}`;
+    if (tasksByStatus[key]) {
+      tasksByStatus[key].push(task);
+    }
+  }
 
   return (
     <div className="kanban">

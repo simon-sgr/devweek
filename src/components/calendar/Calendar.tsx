@@ -2,9 +2,11 @@ import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { useState } from "react";
 
 import {
+  formatDate,
   getCurrentWorkWeek,
   getNextWorkWeek,
   getPreviousWorkWeek,
+  parseTaskDate,
 } from "@/utils/dateUtils";
 import { TaskData } from "../task/types";
 import Task from "../task/Task";
@@ -28,7 +30,7 @@ export default function Calendar({
   onDeleteTask,
 }: CalendarProps) {
   const [currentWeek, setCurrentWeek] = useState<Date[]>(getCurrentWorkWeek());
-  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayStr = formatDate(new Date());
   const [addingDate, setAddingDate] = useState<Date | null>(null);
 
   const goToNextWeek = () => {
@@ -60,13 +62,13 @@ export default function Calendar({
 
         <div className="calendar">
           {currentWeek.map((date) => {
-            const dateStr = date.toISOString().slice(0, 10);
+            const dateStr = formatDate(date);
             const isToday = dateStr === todayStr;
             const dayTasks = tasks.filter((t) => {
               if (!t.date || !date) return false;
 
-              const taskDate =
-                t.date instanceof Date ? t.date : new Date(t.date);
+              const taskDate = parseTaskDate(t.date);
+              if (!taskDate) return false;
               return taskDate.toDateString() === date.toDateString();
             });
 
